@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelasku - Forum Diskusi & Belajar Bersama</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons untuk ikon yang bersih dan modern -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Kustomisasi scrollbar agar rapi */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .fade-in {
+            animation: fadeIn 0.25s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-700">
+
+    <!-- Notifikasi Toast Custom (Pengganti alert) -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- ========================================== -->
+    <!-- 1. HALAMAN LOGIN / JOIN KELAS              -->
+    <!-- ========================================== -->
+    <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-indigo-50 via-blue-50 to-sky-100">
+        <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl shadow-indigo-100/60 overflow-hidden grid grid-cols-1 md:grid-cols-12 border border-indigo-50 fade-in">
+            
+            <!-- Kolom Kiri: Branding & Info Kelas -->
+            <div class="md:col-span-5 bg-gradient-to-br from-primary-600 to-blue-700 p-8 text-white flex flex-col justify-between relative overflow-hidden">
+                <!-- Dekorasi Latar -->
+                <div class="absolute -top-12 -right-12 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
+                <div class="absolute -bottom-16 -left-10 w-48 h-48 bg-indigo-400/20 rounded-full blur-xl"></div>
+                
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2.5 bg-white/15 backdrop-blur-sm px-3.5 py-2 rounded-2xl mb-6">
+                        <i class="ph-fill ph-graduation-cap text-2xl text-amber-300"></i>
+                        <span class="font-heading font-bold text-lg tracking-tight">Kelasku</span>
+                    </div>
+                    <h1 class="font-heading text-2xl sm:text-3xl font-extrabold leading-tight mb-3">
+                        Belajar Bareng Teman Sekelas Jadi Lebih Seru!
+                    </h1>
+                    <p class="text-indigo-100 text-sm leading-relaxed">
+                        Tanya PR yang bikin pusing, berbagi kisi-kisi ujian bareng, dan ngobrol langsung dengan teman satu kelas dalam satu tempat.
+                    </p>
+                </div>
+
+                <div class="relative z-10 mt-8 pt-6 border-t border-white/15">
+                    <p class="text-xs font-medium text-indigo-200 uppercase tracking-wider mb-3">Teman yang sudah bergabung:</p>
+                    <div class="flex items-center gap-2">
+                        <div class="flex -space-x-2.5">
+                            <div class="w-8 h-8 rounded-full bg-amber-400 text-slate-900 font-bold text-xs flex items-center justify-center ring-2 ring-primary-600">AD</div>
+                            <div class="w-8 h-8 rounded-full bg-emerald-400 text-slate-900 font-bold text-xs flex items-center justify-center ring-2 ring-primary-600">SA</div>
+                            <div class="w-8 h-8 rounded-full bg-rose-400 text-white font-bold text-xs flex items-center justify-center ring-2 ring-primary-600">RF</div>
+                            <div class="w-8 h-8 rounded-full bg-sky-300 text-slate-900 font-bold text-xs flex items-center justify-center ring-2 ring-primary-600">NP</div>
+                        </div>
+                        <span class="text-xs text-indigo-100 font-medium">+28 siswa aktif</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kolom Kanan: Form Masuk Kelas -->
+            <div class="md:col-span-7 p-6 sm:p-10 flex flex-col justify-center">
+                <div class="mb-6">
+                    <h2 class="font-heading text-2xl font-bold text-slate-800">Gabung ke Ruang Kelas</h2>
+                    <p class="text-slate-500 text-sm mt-1">Isi data dirimu dan masukkan kode kelas untuk mulai berdiskusi.</p>
+                </div>
+
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Lengkap</label>
+                        <div class="relative">
+                            <i class="ph ph-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                            <input type="text" id="login-name" required placeholder="Contoh: Budi Santoso" 
+                                class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nomor Absen</label>
+                            <div class="relative">
+                                <i class="ph ph-hash absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                                <input type="number" id="login-absen" required min="1" max="50" placeholder="Contoh: 12" 
+                                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Kode Kelas</label>
+                            <div class="relative">
+                                <i class="ph ph-key absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                                <input type="text" id="login-code" required value="XI-IPA-2" placeholder="Misal: XI-IPA-2" 
+                                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm uppercase font-semibold tracking-wide focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pilihan Cepat Kode Kelas -->
+                    <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-100">
+                        <p class="text-xs text-slate-600 mb-2 font-medium flex items-center gap-1.5">
+                            <i class="ph-fill ph-sparkle text-primary-600"></i>
+                            Pilih cepat kelas tersedia atau ketik kode kelas barumu sendiri:
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" onclick="setClassCode('XI-IPA-2')" class="text-xs bg-white hover:bg-primary-600 hover:text-white text-primary-700 font-semibold px-3 py-1.5 rounded-lg border border-primary-200 transition shadow-sm">
+                                XI-IPA-2 (Default)
+                            </button>
+                            <button type="button" onclick="setClassCode('XII-IPS-1')" class="text-xs bg-white hover:bg-primary-600 hover:text-white text-slate-700 font-semibold px-3 py-1.5 rounded-lg border border-slate-200 transition shadow-sm">
+                                XII-IPS-1
+                            </button>
+                            <button type="button" onclick="setClassCode('X-MERDEKA-4')" class="text-xs bg-white hover:bg-primary-600 hover:text-white text-slate-700 font-semibold px-3 py-1.5 rounded-lg border border-slate-200 transition shadow-sm">
+                                X-MERDEKA-4
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 active:scale-[0.99] text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-primary-200 transition flex items-center justify-center gap-2 mt-2">
+                        <span>Masuk ke Kelas</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. DASHBOARD UTAMA APLIKASI KELASKU        -->
+    <!-- ========================================== -->
+    <div id="app-screen" class="hidden min-h-screen flex flex-col md:flex-row">
+        
+        <!-- Header Mobile (Hanya muncul di layar kecil) -->
+        <header class="md:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center gap-2">
+                <div class="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="ph-fill ph-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading font-bold text-slate-800 leading-none">Kelasku</h1>
+                    <span id="mobile-class-badge" class="text-[11px] font-semibold text-primary-600 bg-primary-50 px-2 py-0.5 rounded-md inline-block mt-1">XI-IPA-2</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="copyClassCode()" title="Salin Kode Kelas" class="p-2 text-slate-500 hover:bg-slate-100 rounded-xl">
+                    <i class="ph ph-share-network text-xl"></i>
+                </button>
+                <button onclick="logout()" title="Keluar Kelas" class="p-2 text-rose-500 hover:bg-rose-50 rounded-xl">
+                    <i class="ph ph-sign-out text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigasi (Desktop) -->
+        <aside class="hidden md:flex md:w-64 lg:w-72 bg-white border-r border-slate-200 flex-col justify-between sticky top-0 h-screen shrink-0">
+            <div class="p-5">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-600 to-blue-600 rounded-2xl flex items-center justify-center text-white shadow-md shadow-primary-200">
+                        <i class="ph-fill ph-graduation-cap text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-heading font-extrabold text-xl text-slate-800 tracking-tight">Kelasku</h1>
+                        <p class="text-xs text-slate-400 font-medium">Forum Belajar Bersama</p>
+                    </div>
+                </div>
+
+                <!-- Info Kode Kelas -->
+                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl p-3.5 mb-6">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-500">Ruang Kelas Aktif</span>
+                        <button onclick="copyClassCode()" class="text-xs text-primary-600 hover:text-primary-800 font-semibold flex items-center gap-1" title="Salin kode untuk undang teman">
+                            <i class="ph ph-copy"></i> Salin
+                        </button>
+                    </div>
+                    <div id="sidebar-class-code" class="font-heading font-extrabold text-lg text-slate-800 tracking-wide">XI-IPA-2</div>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Bagikan kode ini ke teman sekelasmu</p>
+                </div>
+
+                <!-- Menu Navigasi Utama -->
+                <nav class="space-y-1.5">
+                    <button onclick="switchTab('pr')" id="nav-pr" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold transition bg-primary-600 text-white shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <i class="ph-fill ph-books text-lg"></i>
+                            <span>Ruang Tanya PR</span>
+                        </div>
+                        <span id="badge-pr-count" class="text-xs bg-white/20 px-2 py-0.5 rounded-full">0</span>
+                    </button>
+
+                    <button onclick="switchTab('kisikisi')" id="nav-kisikisi" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                        <div class="flex items-center gap-3">
+                            <i class="ph-fill ph-exam text-lg"></i>
+                            <span>Kisi-Kisi Ujian</span>
+                        </div>
+                        <span id="badge-kisi-count" class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">0</span>
+                    </button>
+
+                    <button onclick="switchTab('files')" id="nav-files" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                        <div class="flex items-center gap-3">
+                            <i class="ph-fill ph-folder-notch-open text-lg"></i>
+                            <span>Berbagi File</span>
+                        </div>
+                        <span id="badge-files-count" class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">0</span>
+                    </button>
+
+                    <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+                        <div class="flex items-center gap-3">
+                            <i class="ph-fill ph-chats-circle text-lg"></i>
+                            <span>Chat Pribadi (DM)</span>
+                        </div>
+                        <span id="badge-unread-chat" class="text-xs bg-rose-500 text-white px-2 py-0.5 rounded-full hidden">Baru</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Profil Pengguna Bawah -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50/70">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div id="user-avatar" class="w-10 h-10 rounded-full bg-primary-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
+                            BS
+                        </div>
+                        <div class="min-w-0">
+                            <p id="user-display-name" class="text-sm font-bold text-slate-800 truncate">Budi Santoso</p>
+                            <p id="user-display-absen" class="text-xs text-slate-500">Absen • 12</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" title="Ganti Akun / Keluar Kelas" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition">
+                        <i class="ph ph-sign-out text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Konten Utama Tengah -->
+        <main class="flex-1 flex flex-col min-w-0 pb-20 md:pb-0">
+            
+            <!-- ========================================== -->
+            <!-- TAB 1: RUANG TANYA PR                      -->
+            <!-- ========================================== -->
+            <section id="tab-pr" class="p-4 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto fade-in">
+                <!-- Header Tab -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="font-heading text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="ph-duotone ph-books text-primary-600"></i>
+                            Ruang Tanya PR
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-0.5">Diskusikan soal sulit bareng teman sekelas, jangan nyontek doang ya!</p>
+                    </div>
+                    <button onclick="openModal('modal-pr')" class="bg-primary-600 hover:bg-primary-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm shadow-primary-200 transition flex items-center justify-center gap-2 shrink-0">
+                        <i class="ph-bold ph-plus"></i>
+                        <span>Tanya PR Baru</span>
+                    </button>
+                </div>
+
+                <!-- Filter Mata Pelajaran & Pencarian -->
+                <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm mb-6 space-y-3">
+                    <div class="relative">
+                        <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="search-pr" oninput="renderPRList()" placeholder="Cari soal PR, bab pelajaran, atau nama teman..." 
+                            class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    </div>
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" id="pr-subject-filters">
+                        <button onclick="setSubjectFilter('Semua')" class="subject-chip active px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary-600 text-white whitespace-nowrap transition">Semua Mapel</button>
+                        <button onclick="setSubjectFilter('Matematika')" class="subject-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Matematika</button>
+                        <button onclick="setSubjectFilter('IPA / Fisika / Kimia')" class="subject-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">IPA / Saintek</button>
+                        <button onclick="setSubjectFilter('Bahasa Indonesia')" class="subject-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">B. Indonesia</button>
+                        <button onclick="setSubjectFilter('Bahasa Inggris')" class="subject-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">B. Inggris</button>
+                        <button onclick="setSubjectFilter('IPS / Sejarah')" class="subject-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">IPS / Soshum</button>
+                        <button onclick="setSubjectFilter('Lainnya')" class="subject-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Lainnya</button>
+                    </div>
+                </div>
+
+                <!-- Daftar Postingan Tanya PR -->
+                <div id="pr-list" class="space-y-4">
+                    <!-- Diisi lewat JS -->
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- TAB 2: RUANG KISI-KISI UJIAN               -->
+            <!-- ========================================== -->
+            <section id="tab-kisikisi" class="hidden p-4 sm:p-6 lg:p-8 max-w-4xl w-full mx-auto fade-in">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="font-heading text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="ph-duotone ph-exam text-amber-500"></i>
+                            Ruang Kisi-Kisi Ujian
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-0.5">Kumpulan bocoran materi ulangan harian, PTS, PAS, dan catatan rangkuman kelas.</p>
+                    </div>
+                    <button onclick="openModal('modal-kisikisi')" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm shadow-amber-200 transition flex items-center justify-center gap-2 shrink-0">
+                        <i class="ph-bold ph-plus"></i>
+                        <span>Bagikan Kisi-Kisi</span>
+                    </button>
+                </div>
+
+                <!-- Filter Bookmark & Pencarian -->
+                <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm mb-6">
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleBookmarkFilter(false)" id="filter-kisi-all" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-primary-600 text-white transition">
+                            Semua Kisi-Kisi
+                        </button>
+                        <button onclick="toggleBookmarkFilter(true)" id="filter-kisi-saved" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center gap-1.5">
+                            <i class="ph-fill ph-bookmark-simple text-amber-500"></i>
+                            <span>Tersimpan</span>
+                        </button>
+                    </div>
+                    <div class="relative flex-1 min-w-[200px] max-w-xs">
+                        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="search-kisi" oninput="renderKisiList()" placeholder="Cari mapel atau materi..." 
+                            class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    </div>
+                </div>
+
+                <!-- Grid Kartu Kisi-Kisi -->
+                <div id="kisikisi-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Diisi lewat JS -->
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- TAB 2B: RUANG BERBAGI FILE (FILE HUB)      -->
+            <!-- ========================================== -->
+            <section id="tab-files" class="hidden p-4 sm:p-6 lg:p-8 max-w-5xl w-full mx-auto fade-in">
+                <!-- Header Tab Berbagi File -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="font-heading text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="ph-duotone ph-folder-notch-open text-emerald-600"></i>
+                            Ruang Berbagi File
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-0.5">Arsip modul, LKPD, slide presentasi, catatan, dan berkas belajar teman sekelas.</p>
+                    </div>
+                    <button onclick="openModal('modal-file')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-sm shadow-emerald-200 transition flex items-center justify-center gap-2 shrink-0">
+                        <i class="ph-bold ph-upload-simple"></i>
+                        <span>Unggah File</span>
+                    </button>
+                </div>
+
+                <!-- Pencarian & Filter Mata Pelajaran + Kategori File -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm mb-6 space-y-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="sm:col-span-2 relative">
+                            <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="search-files" oninput="renderFileList()" placeholder="Cari nama file, judul, deskripsi, atau pengunggah..."
+                                class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        <div>
+                            <select id="filter-file-subject" onchange="renderFileList()" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <option value="Semua">Semua Mata Pelajaran</option>
+                                <option value="Matematika">Matematika</option>
+                                <option value="IPA / Fisika / Kimia">IPA / Fisika / Kimia</option>
+                                <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                                <option value="Bahasa Inggris">Bahasa Inggris</option>
+                                <option value="IPS / Sejarah">IPS / Sejarah</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Filter Kategori File -->
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1" id="file-category-filters">
+                        <button onclick="setFileCategoryFilter('Semua')" class="file-cat-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white whitespace-nowrap transition">Semua Kategori</button>
+                        <button onclick="setFileCategoryFilter('Modul/Materi')" class="file-cat-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Modul/Materi</button>
+                        <button onclick="setFileCategoryFilter('Latihan/LKPD')" class="file-cat-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Latihan/LKPD</button>
+                        <button onclick="setFileCategoryFilter('Presentasi/Slide')" class="file-cat-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Presentasi/Slide</button>
+                        <button onclick="setFileCategoryFilter('Ringkasan/Catatan')" class="file-cat-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Ringkasan/Catatan</button>
+                        <button onclick="setFileCategoryFilter('Lainnya')" class="file-cat-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Lainnya</button>
+                    </div>
+                </div>
+
+                <!-- Daftar Kartu File -->
+                <div id="files-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Diisi lewat JS -->
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- TAB 3: CHAT PRIBADI (DM TEMAN KELAS)       -->
+            <!-- ========================================== -->
+            <section id="tab-chat" class="hidden flex-1 flex flex-col h-[calc(100vh-116px)] md:h-screen max-w-5xl w-full mx-auto md:p-6 fade-in">
+                <div class="bg-white md:rounded-3xl border border-slate-200 shadow-sm flex-1 flex overflow-hidden">
+                    
+                    <!-- Daftar Teman Sekelas (Kiri) -->
+                    <div id="chat-sidebar" class="w-full md:w-80 border-r border-slate-200 flex flex-col bg-slate-50/50">
+                        <div class="p-4 border-b border-slate-200 bg-white">
+                            <h2 class="font-heading font-bold text-lg text-slate-800">Chat Teman Kelas</h2>
+                            <p class="text-xs text-slate-500">Kirim pesan pribadi ke teman satu kelas</p>
+                        </div>
+                        <div id="chat-contacts-list" class="flex-1 overflow-y-auto divide-y divide-slate-100">
+                            <!-- Diisi lewat JS -->
+                        </div>
+                    </div>
+
+                    <!-- Area Percakapan (Kanan) -->
+                    <div id="chat-window" class="hidden md:flex flex-1 flex-col bg-white">
+                        <!-- Placeholder sebelum memilih teman -->
+                        <div id="chat-empty-state" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                            <div class="w-16 h-16 bg-indigo-50 text-primary-600 rounded-2xl flex items-center justify-center mb-4">
+                                <i class="ph-duotone ph-chats-teardrop text-3xl"></i>
+                            </div>
+                            <h3 class="font-heading font-bold text-slate-800 text-lg">Mulai Obrolan Pribadi</h3>
+                            <p class="text-sm text-slate-500 max-w-xs mt-1">Pilih nama teman di sebelah kiri untuk tanya tugas kelompok atau pinjam catatan.</p>
+                        </div>
+
+                        <!-- Header Chat Aktif -->
+                        <div id="chat-active-header" class="hidden p-4 border-b border-slate-200 flex items-center justify-between bg-white">
+                            <div class="flex items-center gap-3">
+                                <button onclick="closeMobileChat()" class="md:hidden p-1.5 -ml-1 text-slate-500 hover:bg-slate-100 rounded-lg">
+                                    <i class="ph-bold ph-arrow-left text-lg"></i>
+                                </button>
+                                <div id="chat-peer-avatar" class="w-10 h-10 rounded-full bg-emerald-500 text-white font-bold text-sm flex items-center justify-center">
+                                    SA
+                                </div>
+                                <div>
+                                    <h3 id="chat-peer-name" class="font-bold text-sm text-slate-800">Siti Aminah</h3>
+                                    <p id="chat-peer-status" class="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Online • Absen 24
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Isi Pesan -->
+                        <div id="chat-messages-box" class="hidden flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/70">
+                            <!-- Bubble chat -->
+                        </div>
+
+                        <!-- Input Kirim Pesan -->
+                        <form id="chat-form" class="hidden p-3 border-t border-slate-200 bg-white flex items-center gap-2">
+                            <input type="text" id="chat-input" autocomplete="off" placeholder="Tulis pesan ke temanmu..." 
+                                class="flex-1 px-4 py-2.5 bg-slate-100 border border-transparent focus:border-primary-300 focus:bg-white rounded-xl text-sm focus:outline-none transition">
+                            <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white p-2.5 rounded-xl transition flex items-center justify-center shrink-0">
+                                <i class="ph-fill ph-paper-plane-right text-lg"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Panel Kanan: Daftar Teman Online (Desktop Besar) -->
+        <aside class="hidden xl:block w-72 bg-white border-l border-slate-200 p-5 sticky top-0 h-screen overflow-y-auto shrink-0">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-heading font-bold text-sm text-slate-800">Teman Sekelas</h3>
+                <span id="online-count-badge" class="text-xs font-semibold bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-full">6 Online</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Klik nama teman untuk langsung chat pribadi.</p>
+            <div id="right-classmates-list" class="space-y-2.5">
+                <!-- Diisi lewat JS -->
+            </div>
+        </aside>
+
+        <!-- Bottom Navigation Bar (Mobile) -->
+        <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 flex justify-around items-center py-2 px-1 z-30">
+            <button onclick="switchTab('pr')" id="mob-nav-pr" class="mob-nav-btn flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl text-primary-600 font-semibold">
+                <i class="ph-fill ph-books text-xl"></i>
+                <span class="text-[11px]">Tanya PR</span>
+            </button>
+            <button onclick="switchTab('kisikisi')" id="mob-nav-kisikisi" class="mob-nav-btn flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl text-slate-500 font-medium">
+                <i class="ph-fill ph-exam text-xl"></i>
+                <span class="text-[11px]">Kisi-Kisi</span>
+            </button>
+            <button onclick="switchTab('files')" id="mob-nav-files" class="mob-nav-btn flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl text-slate-500 font-medium">
+                <i class="ph-fill ph-folder-notch-open text-xl"></i>
+                <span class="text-[11px]">File</span>
+            </button>
+            <button onclick="switchTab('chat')" id="mob-nav-chat" class="mob-nav-btn relative flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl text-slate-500 font-medium">
+                <i class="ph-fill ph-chats-circle text-xl"></i>
+                <span class="text-[11px]">Chat DM</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. MODAL TAMBAH PERTANYAAN PR              -->
+    <!-- ========================================== -->
+    <div id="modal-pr" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-heading font-bold text-lg text-slate-800">Buat Pertanyaan PR Baru</h3>
+                <button onclick="closeModal('modal-pr')" class="p-1.5 text-slate-400 hover:bg-slate-100 rounded-xl">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <form id="form-new-pr" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Mata Pelajaran</label>
+                    <select id="pr-subject" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <option value="Matematika">Matematika</option>
+                        <option value="IPA / Fisika / Kimia">IPA / Fisika / Kimia</option>
+                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                        <option value="Bahasa Inggris">Bahasa Inggris</option>
+                        <option value="IPS / Sejarah">IPS / Sejarah</option>
+                        <option value="Lainnya">Lainnya (Seni, PJOK, PKN, dll)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Judul Singkat / Bab Soal</label>
+                    <input type="text" id="pr-title" required placeholder="Misal: Cara mencari turunan fungsi aljabar no. 5" 
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Detail Soal & Bagian yang Bingung</label>
+                    <textarea id="pr-content" rows="4" required placeholder="Tuliskan soal lengkapnya atau langkah yang sudah kamu coba..." 
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-pr')" class="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-primary-600 hover:bg-primary-700 text-white rounded-xl shadow-sm">Posting Pertanyaan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 4. MODAL TAMBAH KISI-KISI UJIAN            -->
+    <!-- ========================================== -->
+    <div id="modal-kisikisi" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-heading font-bold text-lg text-slate-800">Bagikan Kisi-Kisi Ujian</h3>
+                <button onclick="closeModal('modal-kisikisi')" class="p-1.5 text-slate-400 hover:bg-slate-100 rounded-xl">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <form id="form-new-kisi" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Mata Pelajaran</label>
+                        <input type="text" id="kisi-subject" required placeholder="Misal: Biologi" 
+                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Jadwal / Jenis Ujian</label>
+                        <input type="text" id="kisi-date" required placeholder="Misal: Besok / PTS Kamis" 
+                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Tingkat Prioritas</label>
+                    <select id="kisi-priority" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <option value="Penting Banget">🔥 Penting Banget (Wajib Pelajari)</option>
+                        <option value="Rangkuman Materi">📘 Rangkuman Materi</option>
+                        <option value="Latihan Soal">✍️ Latihan Soal & Pembahasan</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Poin-Poin Kisi-Kisi / Catatan</label>
+                    <textarea id="kisi-content" rows="4" required placeholder="Tuliskan bab yang keluar, rumus penting, atau pesan dari guru..." 
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-kisikisi')" class="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-sm">Bagikan Kisi-Kisi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 4B. MODAL UNGGAH / BAGIKAN FILE            -->
+    <!-- ========================================== -->
+    <div id="modal-file" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl fade-in my-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-heading font-bold text-lg text-slate-800 flex items-center gap-2">
+                    <i class="ph-duotone ph-upload-simple text-emerald-600"></i>
+                    Unggah & Bagikan File Kelas
+                </h3>
+                <button onclick="closeModal('modal-file')" class="p-1.5 text-slate-400 hover:bg-slate-100 rounded-xl">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+            <form id="form-new-file" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Judul / Nama Tampilan File</label>
+                    <input type="text" id="file-title" required placeholder="Misal: Ringkasan Rumus Integral & Contoh Soal"
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Mata Pelajaran</label>
+                        <select id="file-subject" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="Matematika">Matematika</option>
+                            <option value="IPA / Fisika / Kimia">IPA / Fisika / Kimia</option>
+                            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris</option>
+                            <option value="IPS / Sejarah">IPS / Sejarah</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Kategori File</label>
+                        <select id="file-category" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="Modul/Materi">Modul/Materi</option>
+                            <option value="Latihan/LKPD">Latihan/LKPD</option>
+                            <option value="Presentasi/Slide">Presentasi/Slide</option>
+                            <option value="Ringkasan/Catatan">Ringkasan/Catatan</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Pilih File dari Perangkat</label>
+                    <label class="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-emerald-200 hover:border-emerald-400 bg-emerald-50/40 rounded-2xl cursor-pointer transition text-center">
+                        <i class="ph-duotone ph-file-arrow-up text-3xl text-emerald-600 mb-1.5"></i>
+                        <span id="file-upload-label" class="text-xs sm:text-sm font-semibold text-slate-700">Klik untuk pilih file (PDF, DOC, PPT, XLS, Gambar, TXT, ZIP)</span>
+                        <span class="text-[11px] text-slate-400 mt-0.5">Bisa dipratinjau & diunduh langsung selama sesi browser</span>
+                        <input type="file" id="file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.md,.jpg,.jpeg,.png,.webp,.zip,.rar" class="hidden">
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Tautan Eksternal (Opsional untuk File Sangat Besar)</label>
+                    <input type="url" id="file-external-url" placeholder="https://drive.google.com/... atau link materi"
+                        class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Deskripsi Singkat</label>
+                    <textarea id="file-description" rows="3" required placeholder="Jelaskan isi file, bab yang dibahas, atau catatan penting untuk teman sekelas..."
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-file')" class="px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-sm">Bagikan File</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 4C. MODAL PRATINJAU & DETAIL FILE          -->
+    <!-- ========================================== -->
+    <div id="modal-file-preview" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl fade-in my-8">
+            <div class="flex items-start justify-between gap-3 pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div id="preview-file-icon-box" class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl shrink-0">
+                        <i class="ph-duotone ph-file-text"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 id="preview-file-title" class="font-heading font-bold text-lg text-slate-800 truncate">Judul File</h3>
+                        <p id="preview-file-meta" class="text-xs text-slate-500">Nama file • Ukuran • Pengunggah</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-file-preview')" class="p-1.5 text-slate-400 hover:bg-slate-100 rounded-xl shrink-0">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <div class="my-4">
+                <p id="preview-file-desc" class="text-sm text-slate-600 mb-4 leading-relaxed"></p>
+                <div id="preview-file-stage" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 max-h-96 overflow-auto">
+                    <!-- Konten pratinjau dirender via JS -->
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                <span id="preview-file-note" class="text-xs text-slate-400"></span>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="closeModal('modal-file-preview')" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Tutup</button>
+                    <button type="button" id="preview-download-btn" class="px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl flex items-center gap-1.5 shadow-sm">
+                        <i class="ph-bold ph-download-simple"></i>
+                        <span>Unduh File</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 5. LOGIKA JAVASCRIPT APLIKASI KELASKU      -->
+    <!-- ========================================== -->
+    <script>
+        // Kunci Penyimpanan LocalStorage
+        const STORAGE_KEYS = {
+            USER: 'kelasku_current_user',
+            PRS: 'kelasku_pr_posts',
+            KISI: 'kelasku_kisikisi_posts',
+            FILES: 'kelasku_shared_files',
+            CHATS: 'kelasku_private_chats',
+            BOOKMARKS: 'kelasku_bookmarks'
+        };
+
+        // Data Teman Sekelas Bawaan (Dummy Data Realistis Kelas Indonesia)
+        const DEFAULT_CLASSMATES = [
+            { id: 'u1', name: 'Alya Putri', absen: 3, color: 'bg-rose-500', online: true, role: 'Sekretaris Kelas' },
+            { id: 'u2', name: 'Dimas Pratama', absen: 8, color: 'bg-blue-600', online: true, role: 'Ketua Kelas' },
+            { id: 'u3', name: 'Nabila Zahra', absen: 19, color: 'bg-emerald-500', online: true, role: 'Siswa' },
+            { id: 'u4', name: 'Rizky Ramadhan', absen: 25, color: 'bg-amber-500', online: true, role: 'Sie. Pendidikan' },
+            { id: 'u5', name: 'Siti Aminah', absen: 28, color: 'bg-purple-500', online: false, role: 'Bendahara' },
+            { id: 'u6', name: 'Fajar Nugroho', absen: 11, color: 'bg-cyan-600', online: true, role: 'Siswa' }
+        ];
+
+        // Data Awal Tanya PR
+        const INITIAL_PRS = [
+            {
+                id: 'pr1',
+                classCode: 'XI-IPA-2',
+                author: 'Alya Putri',
+                absen: 3,
+                avatarColor: 'bg-rose-500',
+                subject: 'Matematika',
+                title: 'Bantu nomor 4 paket hal. 78 tentang Trigonometri dong!',
+                content: 'Guys, ada yang udah ketemu hasil akhir dari sin 75° + cos 15° pakai rumus jumlah sudut? Aku dapetnya √6/2 tapi ragu bener apa enggak.',
+                time: '25 menit lalu',
+                likes: 5,
+                likedByMe: false,
+                replies: [
+                    { author: 'Dimas Pratama', absen: 8, text: 'Udah bener Al! Sin 75° itu 1/4(√6 + √2), nah cos 15° juga sama nilainya. Kalau dijumlah jadi 2/4(√6 + √2) = 1/2(√6 + √2). Cek lagi bagian √2 nya ya!', time: '15 menit lalu' },
+                    { author: 'Alya Putri', absen: 3, text: 'Ooh iya lupa masukin √2 nya! Makasih banyak Dim 🙏', time: '10 menit lalu' }
+                ]
+            },
+            {
+                id: 'pr2',
+                classCode: 'XI-IPA-2',
+                author: 'Fajar Nugroho',
+                absen: 11,
+                avatarColor: 'bg-cyan-600',
+                subject: 'Bahasa Inggris',
+                title: 'Tugas Analytical Exposition dikumpulin kapan?',
+                content: 'Permisi teman-teman, mau memastikan tugas teks Analytical Exposition dari Miss Rina dikumpulkan lewat GCR hari ini jam 23.59 atau besok pas jam pelajaran ya?',
+                time: '1 jam lalu',
+                likes: 8,
+                likedByMe: true,
+                replies: [
+                    { author: 'Nabila Zahra', absen: 19, text: 'Besok pas jam pelajaran dikumpulin di kertas folio bergaris Jar, tadi ketua kelas udah konfirmasi ke Miss Rina.', time: '42 menit lalu' }
+                ]
+            }
+        ];
+
+        // Data Awal Kisi-Kisi Ujian
+        const INITIAL_KISI = [
+            {
+                id: 'k1',
+                classCode: 'XI-IPA-2',
+                author: 'Rizky Ramadhan',
+                absen: 25,
+                subject: 'Fisika',
+                date: 'Ulangan Harian - Besok',
+                priority: 'Penting Banget',
+                content: 'Kata Pak Hendra soal UH besok ada 5 esai:\n1. Menghitung momen gaya (torsi) pada batang homogen.\n2. Titik berat benda bidang gabungan (kotak + segitiga).\n3. Hukum kekekalan momentum sudut pada penari balet.\nPelajari contoh soal di LKS halaman 34-36!',
+                time: '2 jam lalu'
+            },
+            {
+                id: 'k2',
+                classCode: 'XI-IPA-2',
+                author: 'Siti Aminah',
+                absen: 28,
+                subject: 'Sejarah Indonesia',
+                date: 'Kuis Jumat',
+                priority: 'Rangkuman Materi',
+                content: 'Fokus hafalkan tokoh-tokoh pergerakan nasional (Budi Utomo, Sarekat Islam, Indische Partij) beserta tahun berdiri dan tujuannya. Soal pilihan ganda 20 nomor.',
+                time: 'Kemarin'
+            }
+        ];
+
+        // Data Awal Ruang Berbagi File
+        const INITIAL_FILES = [
+            {
+                id: 'f1',
+                classCode: 'XI-IPA-2',
+                author: 'Alya Putri',
+                absen: 3,
+                subject: 'Matematika',
+                category: 'Ringkasan/Catatan',
+                title: 'Ringkasan Rumus Turunan & Integral Dasar',
+                fileName: 'Ringkasan_Turunan_Integral_XI.txt',
+                fileSizeLabel: '1.8 KB',
+                ext: 'txt',
+                description: 'Catatan ringkas pola turunan fungsi aljabar, trigonometri, dan aturan rantai lengkap dengan contoh soal singkat.',
+                sampleText: '=== RINGKASAN TURUNAN & INTEGRAL (KELAS XI) ===\n\n1. Turunan Fungsi Aljabar:\n   f(x) = a·x^n  -->  f\'(x) = n·a·x^(n-1)\n\n2. Turunan Trigonometri:\n   d/dx (sin x) = cos x\n   d/dx (cos x) = -sin x\n\n3. Aturan Rantai:\n   Jika y = f(u) dan u = g(x), maka dy/dx = (dy/du)·(du/dx)\n\n4. Integral Tak Tentu:\n   ∫ a·x^n dx = (a/(n+1))·x^(n+1) + C, untuk n ≠ -1',
+                externalUrl: '',
+                objectUrl: null,
+                dataUrl: null,
+                time: '1 jam lalu',
+                likes: 9,
+                likedByMe: false,
+                comments: [
+                    { author: 'Dimas Pratama', absen: 8, text: 'Rapi banget catatannya Al, sangat membantu buat latihan!', time: '35 menit lalu' }
+                ]
+            },
+            {
+                id: 'f2',
+                classCode: 'XI-IPA-2',
+                author: 'Rizky Ramadhan',
+                absen: 25,
+                subject: 'IPA / Fisika / Kimia',
+                category: 'Latihan/LKPD',
+                title: 'LKPD Dinamika Rotasi & Keseimbangan Benda Tegar',
+                fileName: 'LKPD_Dinamika_Rotasi_Paket1.pdf',
+                fileSizeLabel: '1.4 MB',
+                ext: 'pdf',
+                description: 'Lembar kerja latihan soal momen gaya, momen inersia, dan titik berat sebelum ulangan harian.',
+                sampleText: 'LKPD FISIKA - DINAMIKA ROTASI\nTopik: Torsi, Momen Inersia, dan Kesetimbangan Benda Tegar\nSilakan kerjakan soal nomor 1-6 di buku tugas masing-masing.',
+                externalUrl: '',
+                objectUrl: null,
+                dataUrl: null,
+                time: '3 jam lalu',
+                likes: 6,
+                likedByMe: true,
+                comments: []
+            },
+            {
+                id: 'f3',
+                classCode: 'XI-IPA-2',
+                author: 'Nabila Zahra',
+                absen: 19,
+                subject: 'Bahasa Inggris',
+                category: 'Presentasi/Slide',
+                title: 'Slide Kelompok 3 - Analytical Exposition Text',
+                fileName: 'Presentasi_Analytical_Exposition_Kel3.pptx',
+                fileSizeLabel: '3.2 MB',
+                ext: 'pptx',
+                description: 'Bahan presentasi struktur teks (Thesis, Arguments, Reiteration) dan bahasa persuasif untuk diskusi kelas.',
+                sampleText: 'ANALYTICAL EXPOSITION TEXT - GROUP 3\nStructure:\n1. Thesis: State the writer\'s point of view.\n2. Arguments: Elaborate points supporting the thesis.\n3. Reiteration: Restate the main point/conclusion.',
+                externalUrl: '',
+                objectUrl: null,
+                dataUrl: null,
+                time: 'Kemarin',
+                likes: 11,
+                likedByMe: false,
+                comments: []
+            }
+        ];
+
+        // Data Awal Chat Pribadi
+        const INITIAL_CHATS = {
+            'u2': [
+                { sender: 'them', text: 'Halo! Udah ngerjain tugas kelompok Biologi bagian bab 2 belum?', time: '14:20' }
+            ],
+            'u1': [
+                { sender: 'them', text: 'Nanti kalau butuh foto catatan Kimia kabarin aku ya!', time: '10:05' }
+            ]
+        };
+
+        // State Aplikasi
+        let currentUser = null;
+        let prPosts = [];
+        let kisiPosts = [];
+        let sharedFiles = [];
+        let privateChats = {};
+        let bookmarkedIds = [];
+        let currentSubjectFilter = 'Semua';
+        let currentFileCategoryFilter = 'Semua';
+        let showOnlyBookmarked = false;
+        let activeChatPeerId = null;
+        let selectedUploadFile = null;
+        const sessionBlobUrls = {};
+
+        // ==========================================
+        // INISIALISASI & LOCALSTORAGE
+        // ==========================================
+        function initApp() {
+            // Muat data dari LocalStorage atau gunakan data awal
+            const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
+            prPosts = JSON.parse(localStorage.getItem(STORAGE_KEYS.PRS)) || INITIAL_PRS;
+            kisiPosts = JSON.parse(localStorage.getItem(STORAGE_KEYS.KISI)) || INITIAL_KISI;
+            const savedFiles = JSON.parse(localStorage.getItem(STORAGE_KEYS.FILES));
+            sharedFiles = Array.isArray(savedFiles) && savedFiles.length > 0 ? savedFiles : INITIAL_FILES;
+            privateChats = JSON.parse(localStorage.getItem(STORAGE_KEYS.CHATS)) || INITIAL_CHATS;
+            bookmarkedIds = JSON.parse(localStorage.getItem(STORAGE_KEYS.BOOKMARKS)) || ['k1'];
+
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEYS.PRS, JSON.stringify(prPosts));
+            localStorage.setItem(STORAGE_KEYS.KISI, JSON.stringify(kisiPosts));
+            // Hindari menyimpan dataUrl besar ke localStorage agar tidak melewati batas kuota
+            const lightweightFiles = sharedFiles.map(f => ({
+                id: f.id,
+                classCode: f.classCode,
+                author: f.author,
+                absen: f.absen,
+                subject: f.subject,
+                category: f.category,
+                title: f.title,
+                fileName: f.fileName,
+                fileSizeLabel: f.fileSizeLabel,
+                ext: f.ext,
+                description: f.description,
+                sampleText: f.sampleText || '',
+                externalUrl: f.externalUrl || '',
+                time: f.time,
+                likes: f.likes || 0,
+                likedByMe: Boolean(f.likedByMe),
+                comments: Array.isArray(f.comments) ? f.comments : []
+            }));
+            try {
+                localStorage.setItem(STORAGE_KEYS.FILES, JSON.stringify(lightweightFiles));
+            } catch (err) {
+                // Abaikan jika penyimpanan browser penuh
+            }
+            localStorage.setItem(STORAGE_KEYS.CHATS, JSON.stringify(privateChats));
+            localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(bookmarkedIds));
+        }
+
+        // ==========================================
+        // LOGIN / JOIN KELAS
+        // ==========================================
+        function setClassCode(code) {
+            document.getElementById('login-code').value = code;
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('login-name').value.trim();
+            const absen = document.getElementById('login-absen').value.trim();
+            const classCode = document.getElementById('login-code').value.trim().toUpperCase();
+
+            if (!name || !absen || !classCode) return;
+
+            currentUser = {
+                name,
+                absen,
+                classCode,
+                initials: getInitials(name)
+            };
+
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(currentUser));
+            showToast(`Selamat datang di kelas ${classCode}, ${name}!`, 'success');
+            showDashboard();
+        });
+
+        function showDashboard() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+
+            // Update info profil di UI
+            document.getElementById('sidebar-class-code').textContent = currentUser.classCode;
+            document.getElementById('mobile-class-badge').textContent = currentUser.classCode;
+            document.getElementById('user-avatar').textContent = currentUser.initials;
+            document.getElementById('user-display-name').textContent = currentUser.name;
+            document.getElementById('user-display-absen').textContent = `Absen • ${currentUser.absen}`;
+
+            renderClassmates();
+            renderPRList();
+            renderKisiList();
+            renderFileList();
+            renderChatContacts();
+        }
+
+        function logout() {
+            localStorage.removeItem(STORAGE_KEYS.USER);
+            currentUser = null;
+            activeChatPeerId = null;
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            showToast('Kamu telah keluar dari ruang kelas.', 'info');
+        }
+
+        function copyClassCode() {
+            const tempInput = document.createElement('input');
+            tempInput.value = currentUser.classCode;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast(`Kode kelas "${currentUser.classCode}" berhasil disalin!`, 'success');
+        }
+
+        // ==========================================
+        // NAVIGASI TAB
+        // ==========================================
+        function switchTab(tabName) {
+            // Sembunyikan semua tab
+            ['pr', 'kisikisi', 'files', 'chat'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                
+                // Reset style tombol desktop
+                const deskBtn = document.getElementById(`nav-${t}`);
+                deskBtn.classList.remove('bg-primary-600', 'text-white', 'shadow-sm');
+                deskBtn.classList.add('text-slate-600', 'hover:bg-slate-100');
+
+                // Reset style tombol mobile
+                const mobBtn = document.getElementById(`mob-nav-${t}`);
+                mobBtn.classList.remove('text-primary-600', 'font-semibold');
+                mobBtn.classList.add('text-slate-500', 'font-medium');
+            });
+
+            // Tampilkan tab aktif
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            
+            const activeDesk = document.getElementById(`nav-${tabName}`);
+            activeDesk.classList.remove('text-slate-600', 'hover:bg-slate-100');
+            activeDesk.classList.add('bg-primary-600', 'text-white', 'shadow-sm');
+
+            const activeMob = document.getElementById(`mob-nav-${tabName}`);
+            activeMob.classList.remove('text-slate-500', 'font-medium');
+            activeMob.classList.add('text-primary-600', 'font-semibold');
+        }
+
+        // ==========================================
+        // FITUR 1: RUANG TANYA PR
+        // ==========================================
+        function setSubjectFilter(subject) {
+            currentSubjectFilter = subject;
+            document.querySelectorAll('.subject-chip').forEach(btn => {
+                if (btn.textContent.includes(subject) || (subject === 'Semua' && btn.textContent.includes('Semua'))) {
+                    btn.className = 'subject-chip active px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary-600 text-white whitespace-nowrap transition';
+                } else {
+                    btn.className = 'subject-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition';
+                }
+            });
+            renderPRList();
+        }
+
+        function renderPRList() {
+            const container = document.getElementById('pr-list');
+            const query = document.getElementById('search-pr').value.toLowerCase();
+
+            // Filter berdasarkan kode kelas (atau tampilkan default jika kelas baru agar tidak kosong melompong)
+            const filtered = prPosts.filter(post => {
+                const matchSubject = currentSubjectFilter === 'Semua' || post.subject === currentSubjectFilter;
+                const matchQuery = post.title.toLowerCase().includes(query) || 
+                                   post.content.toLowerCase().includes(query) || 
+                                   post.author.toLowerCase().includes(query);
+                return matchSubject && matchQuery;
+            });
+
+            document.getElementById('badge-pr-count').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl border border-slate-200/80 p-10 text-center">
+                        <div class="w-14 h-14 bg-indigo-50 text-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                            <i class="ph-duotone ph-smiley-blank text-3xl"></i>
+                        </div>
+                        <h3 class="font-heading font-bold text-slate-800">Belum ada pertanyaan PR</h3>
+                        <p class="text-sm text-slate-500 mt-1">Jadilah yang pertama bertanya di kategori ini!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(post => `
+                <article class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-indigo-200 transition">
+                    <!-- Header Kartu -->
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full ${post.avatarColor || 'bg-primary-600'} text-white font-bold text-xs flex items-center justify-center shrink-0">
+                                ${getInitials(post.author)}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-sm text-slate-800">${escapeHtml(post.author)}</h4>
+                                    <span class="text-[11px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">Absen ${post.absen}</span>
+                                </div>
+                                <p class="text-xs text-slate-400">${post.time}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-semibold bg-indigo-50 text-primary-700 border border-indigo-100 px-3 py-1 rounded-full shrink-0">
+                            ${escapeHtml(post.subject)}
+                        </span>
+                    </div>
+
+                    <!-- Isi Pertanyaan -->
+                    <h3 class="font-heading font-bold text-base text-slate-800 mb-1.5">${escapeHtml(post.title)}</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line mb-4">${escapeHtml(post.content)}</p>
+
+                    <!-- Aksi Suka & Jumlah Balasan -->
+                    <div class="flex items-center gap-4 pt-3 border-t border-slate-100">
+                        <button onclick="toggleLikePR('${post.id}')" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition ${post.likedByMe ? 'bg-rose-50 text-rose-600' : 'text-slate-500 hover:bg-slate-100'}">
+                            <i class="${post.likedByMe ? 'ph-fill' : 'ph'} ph-heart text-base"></i>
+                            <span>${post.likes} Membantu</span>
+                        </button>
+                        <div class="flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+                            <i class="ph ph-chat-circle-text text-base"></i>
+                            <span>${post.replies.length} Jawaban</span>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Diskusi / Jawaban -->
+                    <div class="mt-4 bg-slate-50/90 rounded-2xl p-3.5 space-y-3">
+                        ${post.replies.map(rep => `
+                            <div class="bg-white p-3 rounded-xl border border-slate-200/70 text-sm">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="font-bold text-xs text-slate-800">${escapeHtml(rep.author)} <span class="font-normal text-slate-400">(Absen ${rep.absen})</span></span>
+                                    <span class="text-[11px] text-slate-400">${rep.time}</span>
+                                </div>
+                                <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">${escapeHtml(rep.text)}</p>
+                            </div>
+                        `).join('')}
+
+                        <!-- Form Balas -->
+                        <form onsubmit="submitReplyPR(event, '${post.id}')" class="flex items-center gap-2 pt-1">
+                            <input type="text" id="reply-input-${post.id}" required placeholder="Tulis jawaban atau bantu jelaskan..." 
+                                class="flex-1 px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shrink-0">
+                                Kirim
+                            </button>
+                        </form>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        document.getElementById('form-new-pr').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const subject = document.getElementById('pr-subject').value;
+            const title = document.getElementById('pr-title').value.trim();
+            const content = document.getElementById('pr-content').value.trim();
+
+            const newPost = {
+                id: 'pr_' + Date.now(),
+                classCode: currentUser.classCode,
+                author: currentUser.name,
+                absen: currentUser.absen,
+                avatarColor: 'bg-primary-600',
+                subject,
+                title,
+                content,
+                time: 'Baru saja',
+                likes: 0,
+                likedByMe: false,
+                replies: []
+            };
+
+            prPosts.unshift(newPost);
+            saveData();
+            renderPRList();
+            closeModal('modal-pr');
+            this.reset();
+            showToast('Pertanyaan PR berhasil diposting!', 'success');
+        });
+
+        function toggleLikePR(id) {
+            const post = prPosts.find(p => p.id === id);
+            if (!post) return;
+            post.likedByMe = !post.likedByMe;
+            post.likes += post.likedByMe ? 1 : -1;
+            saveData();
+            renderPRList();
+        }
+
+        function submitReplyPR(e, postId) {
+            e.preventDefault();
+            const input = document.getElementById(`reply-input-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const post = prPosts.find(p => p.id === postId);
+            if (post) {
+                post.replies.push({
+                    author: currentUser.name,
+                    absen: currentUser.absen,
+                    text,
+                    time: 'Baru saja'
+                });
+                saveData();
+                renderPRList();
+                showToast('Jawabanmu terkirim!', 'success');
+            }
+        }
+
+        // ==========================================
+        // FITUR 2: RUANG KISI-KISI UJIAN
+        // ==========================================
+        function toggleBookmarkFilter(onlySaved) {
+            showOnlyBookmarked = onlySaved;
+            const btnAll = document.getElementById('filter-kisi-all');
+            const btnSaved = document.getElementById('filter-kisi-saved');
+
+            if (onlySaved) {
+                btnSaved.className = 'px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-primary-600 text-white transition flex items-center gap-1.5';
+                btnAll.className = 'px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition';
+            } else {
+                btnAll.className = 'px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-primary-600 text-white transition';
+                btnSaved.className = 'px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center gap-1.5';
+            }
+            renderKisiList();
+        }
+
+        function renderKisiList() {
+            const container = document.getElementById('kisikisi-list');
+            const query = document.getElementById('search-kisi').value.toLowerCase();
+
+            const filtered = kisiPosts.filter(item => {
+                const isSaved = bookmarkedIds.includes(item.id);
+                if (showOnlyBookmarked && !isSaved) return false;
+                return item.subject.toLowerCase().includes(query) || item.content.toLowerCase().includes(query);
+            });
+
+            document.getElementById('badge-kisi-count').textContent = kisiPosts.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white rounded-3xl border border-slate-200/80 p-10 text-center">
+                        <i class="ph-duotone ph-exam text-4xl text-amber-500 mb-2"></i>
+                        <h3 class="font-heading font-bold text-slate-800">Tidak ada kisi-kisi ditemukan</h3>
+                        <p class="text-sm text-slate-500 mt-1">Coba kata kunci lain atau bagikan kisi-kisi ujian yang kamu punya.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => {
+                const isSaved = bookmarkedIds.includes(item.id);
+                const badgeStyle = item.priority === 'Penting Banget' 
+                    ? 'bg-rose-50 text-rose-600 border-rose-200' 
+                    : 'bg-amber-50 text-amber-700 border-amber-200';
+
+                return `
+                    <div class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between hover:border-amber-300 transition">
+                        <div>
+                            <div class="flex items-start justify-between gap-2 mb-3">
+                                <div>
+                                    <span class="inline-block text-xs font-bold uppercase tracking-wider text-primary-600 mb-1">${escapeHtml(item.subject)}</span>
+                                    <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                        <i class="ph-fill ph-calendar-blank text-amber-500"></i>
+                                        <span>${escapeHtml(item.date)}</span>
+                                    </div>
+                                </div>
+                                <button onclick="toggleBookmark('${item.id}')" title="Simpan Kisi-Kisi" class="p-2 rounded-xl border transition ${isSaved ? 'bg-amber-50 border-amber-200 text-amber-500' : 'border-slate-200 text-slate-400 hover:text-slate-600'}">
+                                    <i class="${isSaved ? 'ph-fill' : 'ph'} ph-bookmark-simple text-lg"></i>
+                                </button>
+                            </div>
+
+                            <span class="inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-md border ${badgeStyle} mb-3">
+                                ${escapeHtml(item.priority)}
+                            </span>
+
+                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line mb-4">
+                                ${escapeHtml(item.content)}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-100">
+                            <span>Dibagikan oleh <strong class="text-slate-600">${escapeHtml(item.author)}</strong></span>
+                            <span>${item.time}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('form-new-kisi').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const subject = document.getElementById('kisi-subject').value.trim();
+            const date = document.getElementById('kisi-date').value.trim();
+            const priority = document.getElementById('kisi-priority').value;
+            const content = document.getElementById('kisi-content').value.trim();
+
+            const newKisi = {
+                id: 'k_' + Date.now(),
+                classCode: currentUser.classCode,
+                author: currentUser.name,
+                absen: currentUser.absen,
+                subject,
+                date,
+                priority,
+                content,
+                time: 'Baru saja'
+            };
+
+            kisiPosts.unshift(newKisi);
+            saveData();
+            renderKisiList();
+            closeModal('modal-kisikisi');
+            this.reset();
+            showToast('Kisi-kisi ujian berhasil dibagikan ke kelas!', 'success');
+        });
+
+        function toggleBookmark(id) {
+            if (bookmarkedIds.includes(id)) {
+                bookmarkedIds = bookmarkedIds.filter(b => b !== id);
+                showToast('Dihapus dari kisi-kisi tersimpan.', 'info');
+            } else {
+                bookmarkedIds.push(id);
+                showToast('Kisi-kisi disimpan untuk belajar nanti!', 'success');
+            }
+            saveData();
+            renderKisiList();
+        }
+
+        // ==========================================
+        // FITUR 2B: RUANG BERBAGI FILE (FILE HUB)
+        // ==========================================
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files && e.target.files[0];
+            const labelEl = document.getElementById('file-upload-label');
+            if (!file) {
+                selectedUploadFile = null;
+                labelEl.textContent = 'Klik untuk pilih file (PDF, DOC, PPT, XLS, Gambar, TXT, ZIP)';
+                return;
+            }
+            selectedUploadFile = file;
+            labelEl.textContent = `${file.name} (${formatFileSize(file.size)})`;
+
+            const titleInput = document.getElementById('file-title');
+            if (!titleInput.value.trim()) {
+                titleInput.value = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ');
+            }
+        });
+
+        function setFileCategoryFilter(category) {
+            currentFileCategoryFilter = category;
+            document.querySelectorAll('.file-cat-chip').forEach(btn => {
+                const isSelected = btn.textContent.trim() === category || (category === 'Semua' && btn.textContent.trim() === 'Semua Kategori');
+                btn.className = isSelected
+                    ? 'file-cat-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white whitespace-nowrap transition'
+                    : 'file-cat-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition';
+            });
+            renderFileList();
+        }
+
+        function getFileVisualMeta(ext) {
+            const cleanExt = (ext || '').toLowerCase();
+            if (cleanExt === 'pdf') {
+                return { icon: 'ph-file-pdf', boxClass: 'bg-rose-50 text-rose-600 border-rose-100', label: 'PDF' };
+            }
+            if (['doc', 'docx'].includes(cleanExt)) {
+                return { icon: 'ph-file-doc', boxClass: 'bg-blue-50 text-blue-600 border-blue-100', label: cleanExt.toUpperCase() };
+            }
+            if (['ppt', 'pptx'].includes(cleanExt)) {
+                return { icon: 'ph-presentation-chart', boxClass: 'bg-amber-50 text-amber-600 border-amber-100', label: cleanExt.toUpperCase() };
+            }
+            if (['xls', 'xlsx', 'csv'].includes(cleanExt)) {
+                return { icon: 'ph-file-xls', boxClass: 'bg-emerald-50 text-emerald-600 border-emerald-100', label: cleanExt.toUpperCase() };
+            }
+            if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(cleanExt)) {
+                return { icon: 'ph-file-image', boxClass: 'bg-purple-50 text-purple-600 border-purple-100', label: cleanExt.toUpperCase() };
+            }
+            if (['zip', 'rar', '7z'].includes(cleanExt)) {
+                return { icon: 'ph-file-zip', boxClass: 'bg-orange-50 text-orange-600 border-orange-100', label: cleanExt.toUpperCase() };
+            }
+            return { icon: 'ph-file-text', boxClass: 'bg-indigo-50 text-primary-600 border-indigo-100', label: (cleanExt || 'FILE').toUpperCase() };
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes || bytes <= 0) return 'Tautan';
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+        }
+
+        function renderFileList() {
+            const container = document.getElementById('files-list');
+            const query = (document.getElementById('search-files')?.value || '').toLowerCase();
+            const subjectFilter = document.getElementById('filter-file-subject')?.value || 'Semua';
+
+            const filtered = sharedFiles.filter(file => {
+                const matchCategory = currentFileCategoryFilter === 'Semua' || file.category === currentFileCategoryFilter;
+                const matchSubject = subjectFilter === 'Semua' || file.subject === subjectFilter;
+                const matchQuery = !query ||
+                    file.title.toLowerCase().includes(query) ||
+                    file.fileName.toLowerCase().includes(query) ||
+                    file.description.toLowerCase().includes(query) ||
+                    file.author.toLowerCase().includes(query);
+                return matchCategory && matchSubject && matchQuery;
+            });
+
+            document.getElementById('badge-files-count').textContent = sharedFiles.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white rounded-3xl border border-slate-200/80 p-10 text-center">
+                        <i class="ph-duotone ph-folder-dashed text-4xl text-emerald-600 mb-2"></i>
+                        <h3 class="font-heading font-bold text-slate-800">Belum ada file yang cocok</h3>
+                        <p class="text-sm text-slate-500 mt-1">Coba ubah filter kategori/mapel atau unggah file baru untuk teman sekelas.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(file => {
+                const visual = getFileVisualMeta(file.ext);
+                const comments = Array.isArray(file.comments) ? file.comments : [];
+                return `
+                    <article class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs hover:border-emerald-300 transition flex flex-col justify-between">
+                        <div>
+                            <!-- Bagian Atas: Ikon Tipe File & Badge -->
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-12 h-12 rounded-2xl border ${visual.boxClass} flex flex-col items-center justify-center shrink-0">
+                                        <i class="ph-duotone ${visual.icon} text-2xl"></i>
+                                        <span class="text-[9px] font-extrabold tracking-tight leading-none mt-0.5">${visual.label}</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                            <span class="text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-0.5 rounded-full">${escapeHtml(file.subject)}</span>
+                                            <span class="text-[11px] font-semibold bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full">${escapeHtml(file.category)}</span>
+                                        </div>
+                                        <h3 class="font-heading font-bold text-base text-slate-800 leading-snug line-clamp-1">${escapeHtml(file.title)}</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Nama File Asli & Ukuran -->
+                            <div class="flex items-center justify-between gap-2 text-xs bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl mb-3">
+                                <span class="font-mono text-slate-600 truncate" title="${escapeHtml(file.fileName)}">${escapeHtml(file.fileName)}</span>
+                                <span class="font-semibold text-slate-500 shrink-0">${escapeHtml(file.fileSizeLabel)}</span>
+                            </div>
+
+                            <!-- Deskripsi -->
+                            <p class="text-sm text-slate-600 leading-relaxed mb-4">${escapeHtml(file.description)}</p>
+                        </div>
+
+                        <div>
+                            <!-- Info Pengunggah & Waktu -->
+                            <div class="flex items-center justify-between text-xs text-slate-400 pb-3 border-b border-slate-100 mb-3">
+                                <span>Oleh <strong class="text-slate-700">${escapeHtml(file.author)}</strong> (Absen ${escapeHtml(String(file.absen))})</span>
+                                <span>${escapeHtml(file.time)}</span>
+                            </div>
+
+                            <!-- Tombol Aksi Pratinjau, Unduh, Suka -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <button onclick="openFilePreview('${file.id}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5">
+                                        <i class="ph ph-eye text-sm"></i>
+                                        <span>Pratinjau</span>
+                                    </button>
+                                    <button onclick="downloadSharedFile('${file.id}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-2xs">
+                                        <i class="ph-bold ph-download-simple text-sm"></i>
+                                        <span>Unduh</span>
+                                    </button>
+                                </div>
+
+                                <button onclick="toggleLikeFile('${file.id}')" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition ${file.likedByMe ? 'bg-rose-50 text-rose-600' : 'text-slate-500 hover:bg-slate-100'}">
+                                    <i class="${file.likedByMe ? 'ph-fill' : 'ph'} ph-heart text-sm"></i>
+                                    <span>${file.likes || 0} Bermanfaat</span>
+                                </button>
+                            </div>
+
+                            <!-- Komentar Singkat Opsional -->
+                            <div class="bg-slate-50/90 rounded-xl p-2.5 space-y-2">
+                                ${comments.map(c => `
+                                    <div class="text-xs bg-white px-2.5 py-1.5 rounded-lg border border-slate-200/60">
+                                        <span class="font-bold text-slate-700">${escapeHtml(c.author)}:</span>
+                                        <span class="text-slate-600">${escapeHtml(c.text)}</span>
+                                    </div>
+                                `).join('')}
+                                <form onsubmit="submitFileComment(event, '${file.id}')" class="flex items-center gap-1.5">
+                                    <input type="text" id="file-comment-input-${file.id}" required placeholder="Tulis komentar singkat..."
+                                        class="flex-1 px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <button type="submit" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg transition">
+                                        Kirim
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('form-new-file').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('file-title').value.trim();
+            const subject = document.getElementById('file-subject').value;
+            const category = document.getElementById('file-category').value;
+            const externalUrl = document.getElementById('file-external-url').value.trim();
+            const description = document.getElementById('file-description').value.trim();
+
+            if (!selectedUploadFile && !externalUrl) {
+                showToast('Pilih file dari perangkat atau isi tautan eksternal terlebih dahulu.', 'info');
+                return;
+            }
+
+            const rawFileName = selectedUploadFile
+                ? selectedUploadFile.name
+                : `${title.replace(/\s+/g, '_')}.link`;
+            const extParts = rawFileName.split('.');
+            const ext = extParts.length > 1 ? extParts.pop().toLowerCase() : 'link';
+            const sizeLabel = selectedUploadFile ? formatFileSize(selectedUploadFile.size) : 'Tautan Luar';
+
+            const newFileEntry = {
+                id: 'f_' + Date.now(),
+                classCode: currentUser.classCode,
+                author: currentUser.name,
+                absen: currentUser.absen,
+                subject,
+                category,
+                title,
+                fileName: rawFileName,
+                fileSizeLabel: sizeLabel,
+                ext,
+                description,
+                sampleText: '',
+                externalUrl,
+                time: 'Baru saja',
+                likes: 0,
+                likedByMe: false,
+                comments: []
+            };
+
+            if (selectedUploadFile) {
+                sessionBlobUrls[newFileEntry.id] = URL.createObjectURL(selectedUploadFile);
+                const isTextLike = selectedUploadFile.type.startsWith('text/') || ['txt', 'csv', 'md', 'json'].includes(ext);
+                if (isTextLike && selectedUploadFile.size < 250000) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        newFileEntry.sampleText = String(ev.target.result || '');
+                        sharedFiles.unshift(newFileEntry);
+                        saveData();
+                        renderFileList();
+                    };
+                    reader.readAsText(selectedUploadFile);
+                } else {
+                    sharedFiles.unshift(newFileEntry);
+                    saveData();
+                    renderFileList();
+                }
+            } else {
+                sharedFiles.unshift(newFileEntry);
+                saveData();
+                renderFileList();
+            }
+
+            closeModal('modal-file');
+            this.reset();
+            selectedUploadFile = null;
+            document.getElementById('file-upload-label').textContent = 'Klik untuk pilih file (PDF, DOC, PPT, XLS, Gambar, TXT, ZIP)';
+            showToast('File berhasil dibagikan ke ruang kelas!', 'success');
+        });
+
+        function toggleLikeFile(id) {
+            const file = sharedFiles.find(f => f.id === id);
+            if (!file) return;
+            file.likedByMe = !file.likedByMe;
+            file.likes = (file.likes || 0) + (file.likedByMe ? 1 : -1);
+            saveData();
+            renderFileList();
+        }
+
+        function submitFileComment(e, fileId) {
+            e.preventDefault();
+            const input = document.getElementById(`file-comment-input-${fileId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const file = sharedFiles.find(f => f.id === fileId);
+            if (!file) return;
+            if (!Array.isArray(file.comments)) file.comments = [];
+
+            file.comments.push({
+                author: currentUser.name,
+                absen: currentUser.absen,
+                text,
+                time: 'Baru saja'
+            });
+            saveData();
+            renderFileList();
+            showToast('Komentar file terkirim!', 'success');
+        }
+
+        function openFilePreview(fileId) {
+            const file = sharedFiles.find(f => f.id === fileId);
+            if (!file) return;
+
+            const visual = getFileVisualMeta(file.ext);
+            const iconBox = document.getElementById('preview-file-icon-box');
+            iconBox.className = `w-12 h-12 rounded-2xl border ${visual.boxClass} flex items-center justify-center text-2xl shrink-0`;
+            iconBox.innerHTML = `<i class="ph-duotone ${visual.icon}"></i>`;
+
+            document.getElementById('preview-file-title').textContent = file.title;
+            document.getElementById('preview-file-meta').textContent = `${file.fileName} • ${file.fileSizeLabel} • Oleh ${file.author} (Absen ${file.absen})`;
+            document.getElementById('preview-file-desc').textContent = file.description;
+
+            const stage = document.getElementById('preview-file-stage');
+            const noteEl = document.getElementById('preview-file-note');
+            const blobUrl = sessionBlobUrls[file.id];
+            const isImage = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes((file.ext || '').toLowerCase());
+            const isPdf = (file.ext || '').toLowerCase() === 'pdf';
+
+            if (blobUrl && isImage) {
+                stage.innerHTML = `<img src="${blobUrl}" alt="${escapeHtml(file.title)}" class="max-h-72 mx-auto rounded-xl object-contain">`;
+                noteEl.textContent = 'Pratinjau gambar langsung dari file terunggah.';
+            } else if (blobUrl && isPdf) {
+                stage.innerHTML = `<iframe src="${blobUrl}" class="w-full h-72 rounded-xl bg-white border border-slate-200" title="Pratinjau PDF"></iframe>`;
+                noteEl.textContent = 'Pratinjau dokumen PDF aktif.';
+            } else if (file.sampleText) {
+                stage.innerHTML = `<pre class="text-xs text-slate-700 whitespace-pre-wrap font-mono leading-relaxed">${escapeHtml(file.sampleText)}</pre>`;
+                noteEl.textContent = 'Menampilkan cuplikan isi teks/catatan.';
+            } else if (file.externalUrl) {
+                stage.innerHTML = `
+                    <div class="text-center py-6">
+                        <p class="text-xs text-slate-500 mb-2">Tautan eksternal terdaftar:</p>
+                        <a href="${escapeHtml(file.externalUrl)}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-primary-600 underline break-all">${escapeHtml(file.externalUrl)}</a>
+                    </div>
+                `;
+                noteEl.textContent = 'File eksternal dibuka di tab baru.';
+            } else {
+                stage.innerHTML = `
+                    <div class="text-center py-6 space-y-1.5">
+                        <p class="text-sm font-bold text-slate-700">${escapeHtml(file.fileName)}</p>
+                        <p class="text-xs text-slate-500">Kategori: ${escapeHtml(file.category)} • Mapel: ${escapeHtml(file.subject)} • Ukuran: ${escapeHtml(file.fileSizeLabel)}</p>
+                        <p class="text-xs text-slate-400 pt-1">Klik "Unduh File" untuk menyimpan berkas atau salinan informasinya ke perangkatmu.</p>
+                    </div>
+                `;
+                noteEl.textContent = 'Pratinjau detail metadata berkas.';
+            }
+
+            const dlBtn = document.getElementById('preview-download-btn');
+            dlBtn.onclick = function() {
+                downloadSharedFile(file.id);
+            };
+
+            openModal('modal-file-preview');
+        }
+
+        function downloadSharedFile(fileId) {
+            const file = sharedFiles.find(f => f.id === fileId);
+            if (!file) return;
+
+            const blobUrl = sessionBlobUrls[file.id];
+            const link = document.createElement('a');
+
+            if (blobUrl) {
+                link.href = blobUrl;
+                link.download = file.fileName;
+            } else if (file.externalUrl) {
+                window.open(file.externalUrl, '_blank', 'noopener,noreferrer');
+                showToast(`Membuka tautan "${file.title}"...`, 'info');
+                return;
+            } else {
+                const contentToSave = file.sampleText
+                    ? file.sampleText
+                    : `KELASKU - ARSIP BERKAS KELAS\nJudul: ${file.title}\nNama File: ${file.fileName}\nMata Pelajaran: ${file.subject}\nKategori: ${file.category}\nPengunggah: ${file.author} (Absen ${file.absen})\n\nDeskripsi:\n${file.description}\n`;
+                const blob = new Blob([contentToSave], { type: 'text/plain;charset=utf-8' });
+                const tempUrl = URL.createObjectURL(blob);
+                link.href = tempUrl;
+                link.download = file.sampleText ? file.fileName : `${file.fileName}.txt`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(tempUrl), 1000);
+                showToast(`Mengunduh "${file.title}"...`, 'success');
+                return;
+            }
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(`Mengunduh "${file.fileName}"...`, 'success');
+        }
+
+        // ==========================================
+        // FITUR 3: CHAT PRIBADI & DAFTAR TEMAN
+        // ==========================================
+        function renderClassmates() {
+            const rightList = document.getElementById('right-classmates-list');
+            rightList.innerHTML = DEFAULT_CLASSMATES.map(friend => `
+                <button onclick="openDirectChat('${friend.id}')" class="w-full flex items-center justify-between p-2.5 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-200/80 transition text-left group">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="relative shrink-0">
+                            <div class="w-9 h-9 rounded-full ${friend.color} text-white font-bold text-xs flex items-center justify-center">
+                                ${getInitials(friend.name)}
+                            </div>
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ring-2 ring-white ${friend.online ? 'bg-emerald-500' : 'bg-slate-300'}"></span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-slate-800 truncate group-hover:text-primary-600 transition">${friend.name}</p>
+                            <p class="text-[11px] text-slate-400 truncate">Absen ${friend.absen} • ${friend.role}</p>
+                        </div>
+                    </div>
+                    <i class="ph ph-chat-circle-dots text-slate-400 group-hover:text-primary-600 text-lg"></i>
+                </button>
+            `).join('');
+        }
+
+        function renderChatContacts() {
+            const container = document.getElementById('chat-contacts-list');
+            container.innerHTML = DEFAULT_CLASSMATES.map(friend => {
+                const history = privateChats[friend.id] || [];
+                const lastMsg = history.length > 0 ? history[history.length - 1].text : 'Klik untuk mulai chat pribadi...';
+                const isSelected = activeChatPeerId === friend.id;
+
+                return `
+                    <button onclick="selectChatPeer('${friend.id}')" class="w-full p-3.5 flex items-center gap-3 text-left transition ${isSelected ? 'bg-indigo-50/80' : 'hover:bg-white'}">
+                        <div class="relative shrink-0">
+                            <div class="w-11 h-11 rounded-full ${friend.color} text-white font-bold text-sm flex items-center justify-center">
+                                ${getInitials(friend.name)}
+                            </div>
+                            <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-white ${friend.online ? 'bg-emerald-500' : 'bg-slate-300'}"></span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-0.5">
+                                <h4 class="font-bold text-sm text-slate-800 truncate">${friend.name}</h4>
+                                <span class="text-[10px] font-semibold text-slate-400">Absen ${friend.absen}</span>
+                            </div>
+                            <p class="text-xs text-slate-500 truncate">${escapeHtml(lastMsg)}</p>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function openDirectChat(peerId) {
+            switchTab('chat');
+            selectChatPeer(peerId);
+        }
+
+        function selectChatPeer(peerId) {
+            activeChatPeerId = peerId;
+            const peer = DEFAULT_CLASSMATES.find(f => f.id === peerId);
+            if (!peer) return;
+
+            // Responsif Mobile: sembunyikan sidebar kontak, tampilkan jendela chat
+            document.getElementById('chat-sidebar').classList.add('hidden', 'md:flex');
+            document.getElementById('chat-window').classList.remove('hidden');
+            document.getElementById('chat-window').classList.add('flex');
+
+            document.getElementById('chat-empty-state').classList.add('hidden');
+            document.getElementById('chat-active-header').classList.remove('hidden');
+            document.getElementById('chat-messages-box').classList.remove('hidden');
+            document.getElementById('chat-form').classList.remove('hidden');
+
+            // Set Header Peer
+            const avatar = document.getElementById('chat-peer-avatar');
+            avatar.className = `w-10 h-10 rounded-full ${peer.color} text-white font-bold text-sm flex items-center justify-center`;
+            avatar.textContent = getInitials(peer.name);
+            document.getElementById('chat-peer-name').textContent = peer.name;
+            document.getElementById('chat-peer-status').innerHTML = peer.online 
+                ? `<span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Online • Absen ${peer.absen}`
+                : `<span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span> Terakhir dilihat baru saja • Absen ${peer.absen}`;
+
+            renderChatContacts();
+            renderChatMessages();
+        }
+
+        function closeMobileChat() {
+            document.getElementById('chat-sidebar').classList.remove('hidden');
+            document.getElementById('chat-window').classList.add('hidden');
+            document.getElementById('chat-window').classList.remove('flex');
+        }
+
+        function renderChatMessages() {
+            const box = document.getElementById('chat-messages-box');
+            const messages = privateChats[activeChatPeerId] || [];
+
+            if (messages.length === 0) {
+                box.innerHTML = `<div class="text-center text-xs text-slate-400 my-8">Belum ada riwayat chat. Sapa temanmu duluan! 👋</div>`;
+                return;
+            }
+
+            box.innerHTML = messages.map(m => {
+                const isMe = m.sender === 'me';
+                return `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                        <div class="max-w-[80%] sm:max-w-[70%] px-4 py-2.5 rounded-2xl text-sm ${isMe ? 'bg-primary-600 text-white rounded-br-xs' : 'bg-white border border-slate-200 text-slate-700 rounded-bl-xs shadow-2xs'}">
+                            ${escapeHtml(m.text)}
+                        </div>
+                        <span class="text-[10px] text-slate-400 mt-1 px-1">${m.time}</span>
+                    </div>
+                `;
+            }).join('');
+
+            box.scrollTop = box.scrollHeight;
+        }
+
+        document.getElementById('chat-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || !activeChatPeerId) return;
+
+            if (!privateChats[activeChatPeerId]) {
+                privateChats[activeChatPeerId] = [];
+            }
+
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            privateChats[activeChatPeerId].push({
+                sender: 'me',
+                text,
+                time: timeStr
+            });
+
+            input.value = '';
+            saveData();
+            renderChatMessages();
+            renderChatContacts();
+
+            // Simulasi balasan otomatis teman sekelas agar interaktif
+            const peerId = activeChatPeerId;
+            setTimeout(() => {
+                const autoReplies = [
+                    'Siap, bentar ya aku cek buku catatanku dulu!',
+                    'Oke makasih infonya ya 🙌',
+                    'Wah sama, aku juga lagi ngerjain bagian itu nih.',
+                    'Boleh banget, nanti pas istirahat kita bahas bareng di kelas ya!'
+                ];
+                const randomReply = autoReplies[Math.floor(Math.random() * autoReplies.length)];
+                privateChats[peerId].push({
+                    sender: 'them',
+                    text: randomReply,
+                    time: timeStr
+                });
+                saveData();
+                if (activeChatPeerId === peerId) {
+                    renderChatMessages();
+                }
+                renderChatContacts();
+            }, 1200);
+        });
+
+        // ==========================================
+        // UTILITAS MODAL, TOAST & HELPER
+        // ==========================================
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = type === 'success' 
+                ? 'bg-slate-800 text-white border-slate-700' 
+                : 'bg-white text-slate-800 border-slate-200';
+
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-lg border text-xs font-semibold fade-in ${colors}`;
+            toast.innerHTML = `
+                <i class="ph-fill ${type === 'success' ? 'ph-check-circle text-emerald-400' : 'ph-info text-primary-500'} text-lg"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Jalankan aplikasi saat halaman dimuat
+        window.addEventL
